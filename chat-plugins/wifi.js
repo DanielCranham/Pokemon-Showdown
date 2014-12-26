@@ -1,9 +1,10 @@
 function usersToNames(name) {
 	return Users.get(name).name;
 }
+
 exports.commands = {
 
-	giveawayhelp: function(target, room, user) {
+	giveawayhelp: function	(target, room, user) {
 		if (room.id !== 'wifi') return this.sendReply('This command can only be used in the Wi-Fi room.');
 		if (!this.canBroadcast()) return;
 		this.sendReplyBox(
@@ -27,7 +28,7 @@ exports.commands = {
 
 	qg: 'questiongiveaway',
 	quizgiveaway: 'questiongiveaway',
-	questiongiveaway: function(target, room, user, connection, cmd) {
+	questiongiveaway: function	(target, room, user, connection, cmd) {
 		if (room.id !== 'wifi') return this.sendReply('This command can only be used in the Wi-Fi room.');
 		if (!this.can('mute', null, room)) return false;
 		if (room.giveaway) return this.sendReply('There is already a giveaway going on!');
@@ -106,7 +107,7 @@ exports.commands = {
 	},
 
 	grm: 'giveawayremind',
-	giveawayremind: function(target, room, user, connection, cmd) {
+	giveawayremind: function	(target, room, user, connection, cmd) {
 		if (room.id !== 'wifi') return this.sendReply('This command can only be used in the Wi-Fi room.');
 		if (!room.giveaway) return this.sendReply('There is no giveaway going on at the moment.');
 		if (room.giveaway.type === 'question') {
@@ -135,7 +136,7 @@ exports.commands = {
 	},
 
 	gquestion: 'giveawayquestion',
-	giveawayquestion: function(target, room, user, connection, cmd) {
+	giveawayquestion: function	(target, room, user, connection, cmd) {
 		if (room.id !== 'wifi') return this.sendReply('This command can only be used in the Wi-Fi room.');
 		if (!room.giveaway) return this.sendReply('There is no giveaway going on at the moment.');
 		if (room.giveaway.type !== 'question') return this.sendReply(
@@ -151,7 +152,7 @@ exports.commands = {
 			'Question: <b>' + room.giveaway.question);
 	},
 
-	changequestion: function(target, room, user, connection, cmd) {
+	changequestion: function	(target, room, user, connection, cmd) {
 		if (room.id !== 'wifi') return this.sendReply('This command can only be used in the Wi-Fi room.');
 		if (!room.giveaway) return this.sendReply('There is no giveaway going on at the moment.');
 		if (room.giveaway.type !== 'question') return this.sendReply(
@@ -165,7 +166,7 @@ exports.commands = {
 		this.sendReply('The question has been changed to "' + target.trim() + '"');
 	},
 
-	changeanswer: function(target, room, user, connection, cmd) {
+	changeanswer: function	(target, room, user, connection, cmd) {
 		if (room.id !== 'wifi') return this.sendReply('This command can only be used in the Wi-Fi room.');
 		if (!room.giveaway) return this.sendReply('There is no giveaway going on at the moment.');
 		if (room.giveaway.type !== 'question') return this.sendReply(
@@ -188,7 +189,7 @@ exports.commands = {
 			.join(', ') + '</b> (Any one of them)' : '"' + room.giveaway.answer + '"'));
 	},
 
-	viewanswer: function(target, room, user, connection, cmd) {
+	viewanswer: function	(target, room, user, connection, cmd) {
 		if (room.id !== 'wifi') return this.sendReply('This command can only be used in the Wi-Fi room.');
 		if (!room.giveaway) return this.sendReply('There is no giveaway going on at the moment.');
 		if (room.giveaway.type !== 'question') return this.sendReply(
@@ -206,7 +207,7 @@ exports.commands = {
 	},
 
 	ga: 'guessanswer',
-	guessanswer: function(target, room, user, connection, cmd) {
+	guessanswer: function	(target, room, user, connection, cmd) {
 		if (room.id !== 'wifi') return this.sendReply('This command can only be used in the Wi-Fi room.');
 		if (!room.giveaway) return this.sendReply('There is no giveaway going on at the moment.');
 		if (Users.get(room.giveaway.user) === user.userid || Users.get(room.giveaway.user).getAlts().map(toId).indexOf(user.userid) > -
@@ -246,7 +247,7 @@ exports.commands = {
 	},
 
 	giveawayend: 'endgiveaway',
-	endgiveaway: function(target, room, user, connection, cmd) {
+	endgiveaway: function	(target, room, user, connection, cmd) {
 		if (room.id !== 'wifi') return this.sendReply('This command can only be used in the Wi-Fi room.');
 		if (!room.giveaway) return this.sendReply('There is no giveaway going on at the moment.');
 		if (!this.can('mute', null, room)) return false;
@@ -257,7 +258,7 @@ exports.commands = {
 	},
 
 	lg: 'lotterygiveaway',
-	lotterygiveaway: function(target, room, user, connection, cmd) {
+	lotterygiveaway: function	(target, room, user, connection, cmd) {
 		if (room.id !== 'wifi') return this.sendReply('This command can only be used in the Wi-Fi room.');
 		if (!this.can('mute', null, room)) return false;
 		if (room.giveaway) return this.sendReply('There is already a giveaway going on!');
@@ -340,7 +341,7 @@ exports.commands = {
 		}, 2000 * 60);
 	},
 
-	joinlottery: function(target, room, user, connection, cmd) {
+	joinlottery: function	(target, room, user, connection, cmd) {
 		if (room.id !== 'wifi') return this.sendReply('This command can only be used in the Wi-Fi room.');
 		if (!room.giveaway) return this.sendReply('There is no giveaway going on at the moment.');
 		if (room.giveaway.type !== 'lottery') return this.sendReply('This is not a lottery giveaway.');
@@ -356,7 +357,7 @@ exports.commands = {
 		this.sendReply('You have successfully joined the lottery. Good luck on winning!');
 	},
 
-	leavelottery: function(target, room, user, connection, cmd) {
+	leavelottery: function	(target, room, user, connection, cmd) {
 		if (room.id !== 'wifi') return this.sendReply('This command can only be used in the Wi-Fi room.');
 		if (!room.giveaway) return this.sendReply('There is no giveaway going on at the moment.');
 		if (room.giveaway.type !== 'lottery') return this.sendReply('This is not a lottery giveaway.');
