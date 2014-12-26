@@ -301,7 +301,7 @@ exports.commands = {
 			'<button name = "send" value = "/joinlottery"><font size = 1><b>Join</b></font></button> <button name = "send" value = "/leavelottery"><font size = 1><b>Leave</b></font></button><br/><br/><font size = 1><b><u>Note:</u> Please do not join if you don\'t have a 3DS and a copy of Pokémon X, Y, ΩR, or αS'
 		);
 		var thisroom = room;
-		room.giveaway.timer = setTimeout(function() {
+		room.giveaway.timer = setTimeout(function	() {
 			if (thisroom.giveaway.members.length < 4 + room.giveaway.winnumber) {
 				thisroom.add("|html|<b>The giveaway lottery has been ended due to the lack of users.");
 				thisroom.update();
