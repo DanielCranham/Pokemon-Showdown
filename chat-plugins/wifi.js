@@ -92,14 +92,14 @@ exports.commands = {
 			'The question will be displayed in a minute!');
 
 		var thisroom = room;
-		room.giveaway.timer = setTimeout(function() {
+		room.giveaway.timer = setTimeout(function	() {
 			thisroom.add('|html|<center><div class = "broadcast-blue">Question: <b>' + question + '</b><br/>' +
 				'Type in <b>/guessanswer <i>answer</i></b> into the chat to guess the answer right now!'
 			);
 			thisroom.update();
 			thisroom.giveaway.started = true;
 		}, 1000 * 60);
-		room.giveaway.endtimer = setTimeout(function() {
+		room.giveaway.endtimer = setTimeout(function	() {
 			thisroom.add('|html|<b>The giveaway has been ended for failing to answer the question</b>');
 			thisroom.update();
 			delete room.giveaway;
@@ -229,8 +229,8 @@ exports.commands = {
 		if (/[^a-z0-9 ]+/ig.test(target.toLowerCase())) return this.sendReply("Don't include any special characters in your answer!");
 		if (target.match(/ /g) && target.match(/ /g).length > 2) return this.sendReply(
 			'You can only enter in a maximum of 3 words in your answer.');
-		if (typeof room.giveaway.answer === 'object' ? room.giveaway.answer.map(toId).indexOf(toId(target)) === -1 : toId(target) !==
-			toId(room.giveaway.answer)) {
+		if (typeof room.giveaway.answer === 'object' ? room.giveaway.answer.map(toId).indexOf(toId(target)) === -1 : toId(target)
+			!== toId(room.giveaway.answer)) {
 			if (room.giveaway.answered[user.userid]) room.giveaway.answered[user.userid] ++;
 			else room.giveaway.answered[user.userid] = 1;
 			if (room.giveaway.answered[user.userid] === 3)
