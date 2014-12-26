@@ -210,8 +210,8 @@ exports.commands = {
 	guessanswer: function	(target, room, user, connection, cmd) {
 		if (room.id !== 'wifi') return this.sendReply('This command can only be used in the Wi-Fi room.');
 		if (!room.giveaway) return this.sendReply('There is no giveaway going on at the moment.');
-		if (Users.get(room.giveaway.user) === user.userid || Users.get(room.giveaway.user).getAlts().map(toId).indexOf(user.userid) > -
-			1) return this.sendReply("You cannot answer the question when you're the one who's giving away the prize!");
+		if (Users.get(room.giveaway.user) === user.userid || Users.get(room.giveaway.user).getAlts().map(toId).indexOf(user.userid) >
+			-1) return this.sendReply("You cannot answer the question when you're the one who's giving away the prize!");
 		if (Users.get(room.giveaway.starter).userid === user.userid || Users.get(room.giveaway.starter).getAlts().map(toId).indexOf(user.userid) >
 			-1) return this.sendReply("You cannot answer the question when you're the one who started the giveaway!");
 		if (room.giveaway.type !== 'question') return this.sendReply(
