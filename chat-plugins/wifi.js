@@ -1,7 +1,6 @@
 function usersToNames(name) {
 	return Users.get(name).name;
 }
-
 exports.commands = {
 
 	giveawayhelp: function(target, room, user) {
