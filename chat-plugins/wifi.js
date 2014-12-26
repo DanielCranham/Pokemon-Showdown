@@ -229,8 +229,8 @@ exports.commands = {
 		if (/[^a-z0-9 ]+/ig.test(target.toLowerCase())) return this.sendReply("Don't include any special characters in your answer!");
 		if (target.match(/ /g) && target.match(/ /g).length > 2) return this.sendReply(
 			'You can only enter in a maximum of 3 words in your answer.');
-		if (typeof room.giveaway.answer === 'object' ? room.giveaway.answer.map(toId).indexOf(toId(target)) === -1 : toId(target) !== toId(room.giveaway.answer)) {
-			if (room.giveaway.answered[user.userid]) room.giveaway.answered[user.userid] ++;
+		if (typeof room.giveaway.answer === 'object' ? room.giveaway.answer.map(toId).indexOf(toId(target)) === -1 : toId(target) !==toId(room.giveaway.answer)) {
+			if (room.giveaway.answered[user.userid])room.giveaway.answered[user.userid]++;
 			else room.giveaway.answered[user.userid] = 1;
 			if (room.giveaway.answered[user.userid] === 3)
 				return this.sendReply("'" + target + "'" + " is not the correct answer... Better luck answering next time!");
