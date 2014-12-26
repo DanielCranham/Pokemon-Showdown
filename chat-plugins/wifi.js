@@ -212,7 +212,7 @@ exports.commands = {
 		if (!room.giveaway) return this.sendReply('There is no giveaway going on at the moment.');
 		if (Users.get(room.giveaway.user) === user.userid || Users.get(room.giveaway.user).getAlts().map(toId).indexOf(user.userid) > -
 			1) return this.sendReply("You cannot answer the question when you're the one who's giving away the prize!");
-		if (Users.get(room.giveaway.starter) == user.userid || Users.get(room.giveaway.starter).getAlts().map(toId).indexOf(user.userid) >
+		if (Users.get(room.giveaway.starter).userid === user.userid || Users.get(room.giveaway.starter).getAlts().map(toId).indexOf(user.userid) >
 			-1) return this.sendReply("You cannot answer the question when you're the one who started the giveaway!");
 		if (room.giveaway.type !== 'question') return this.sendReply(
 			'This is not a question giveaway. There are no questions involved.');
@@ -345,7 +345,7 @@ exports.commands = {
 		if (room.id !== 'wifi') return this.sendReply('This command can only be used in the Wi-Fi room.');
 		if (!room.giveaway) return this.sendReply('There is no giveaway going on at the moment.');
 		if (room.giveaway.type !== 'lottery') return this.sendReply('This is not a lottery giveaway.');
-		if (Users.get(room.giveaway.user) !== user.userid) return this.sendReply(
+		if (Users.get(room.giveaway.user).userid === user.userid) return this.sendReply(
 			"You cannot join the lottery when you're the one who's giving away the prize!");
 
 		if (room.giveaway.members.map(usersToNames).indexOf(user.userid) > -1) return this.sendReply(
