@@ -7,11 +7,12 @@ exports.commands = {
 	giveaway: function(target, room, user, connection, cmd) {
 		if (room.id !== 'wifi') return this.sendReply('This command can only be used in the Wi-Fi room.');
 		var command = target.substring(0, target.indexOf(' ')) || toId(target);
-		var target = (command === target ? '' : target.substr(target.indexOf(' ') + 1));
+		var original = target;
+		var target = (command === original ? '' : original.substr(original.indexOf(' ') + 1));
 		switch (toId(command)) {
 			case 'help':
 				if (!this.canBroadcast()) return;
-				return this.sendReplyBox(
+				this.sendReplyBox(
 					'<strong><em><font size="2" color="red">Wi-Fi Room Giveaway help</font></strong></em><br />' +
 					'Note that all commands start with \'/giveaway\', with the exception of /guessanswer.<br /><br />' +
 					'<strong>Player commands:</strong><br />' +
@@ -128,7 +129,8 @@ exports.commands = {
 				if (room.giveaway.started) return this.sendReply('The giveaway has already started. You cannot change the question now.');
 				if (!toId(target)) return this.sendReply("|html|/changeanswer <i>new question</i> - Allows the starter of the giveaway to change the question, but only before the giveaway starts.");
 				room.giveaway.question = target.trim();
-				return this.sendReply('The question has been changed to "' + target.trim() + '"');
+				this.sendReply('The question has been changed to "' + target.trim() + '"');
+
 				break;
 
 			case 'changeanswer':
@@ -145,7 +147,7 @@ exports.commands = {
 					}
 					room.giveaway.answer = target;
 				} else room.giveaway.answer = target.trim();
-				return this.sendReply('|html|The answer has been changed to <b>' + ((typeof room.giveaway.answer === 'object') ? room.giveaway.answer.join(', ') + '</b> (Any one of them)' : '"' + room.giveaway.answer + '"'));
+				this.sendReply('|html|The answer has been changed to <b>' + ((typeof room.giveaway.answer === 'object') ? room.giveaway.answer.join(', ') + '</b> (Any one of them)' : '"' + room.giveaway.answer + '"'));
 
 				break;
 			case 'answer':
@@ -158,8 +160,9 @@ exports.commands = {
 					part.pop();
 					return this.sendReplyBox(typeof room.giveaway.answer === 'object' ? 'The possible answers are <b>' + part.join(', ') + "</b> and <b>" + room.giveaway.answer[room.giveaway.answer.length - 1] + '</b>.' : 'The answer is <b>' + room.giveaway.answer + '</b>.');
 				}
-				return this.sendReply('/viewanswer - Only the starter of the giveaway or the person who\'s giving away the prize can view the answer.');
+				this.sendReply('/viewanswer - Only the starter of the giveaway or the person who\'s giving away the prize can view the answer.');
 				break;
+
 			case 'guessanswer':
 			case 'guess':
 				if (!room.giveaway) return this.sendReply('There is no giveaway going on at the moment.');
