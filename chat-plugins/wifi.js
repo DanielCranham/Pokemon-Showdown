@@ -4,7 +4,7 @@ function usersToNames(name) {
 
 exports.commands = {
 
-	giveaway: function(target, room, user, connection, cmd) {
+	giveaway: function	(target, room, user, connection, cmd) {
 		if (room.id !== 'wifi') return this.sendReply('This command can only be used in the Wi-Fi room.');
 		var command = target.substring(0, target.indexOf(' ')) || toId(target);
 		var newtarget = (command === target ? '' : target.substr(target.indexOf(' ') + 1));
@@ -90,13 +90,13 @@ exports.commands = {
 					'The question will be displayed in a minute!');
 
 				var thisroom = room;
-				room.giveaway.timer = setTimeout(function() {
+				room.giveaway.timer = setTimeout(function	() {
 					thisroom.add('|html|<center><div class = "broadcast-blue">Question: <b>' + question + '</b><br/>' +
 						'Type in <b>/guessanswer <i>answer</i></b> into the chat to guess the answer right now!');
 					thisroom.update();
 					thisroom.giveaway.started = true;
 				}, 1000 * 60);
-				room.giveaway.endtimer = setTimeout(function() {
+				room.giveaway.endtimer = setTimeout(function	() {
 					thisroom.add('|html|<b>The giveaway has been ended for failing to answer the question</b>');
 					thisroom.update();
 					delete room.giveaway;
@@ -178,7 +178,7 @@ exports.commands = {
 				if (/[^a-z0-9 ]+/ig.test(target.toLowerCase())) return this.sendReply("Don't include any special characters in your answer!");
 				if (target.match(/ /g) && target.match(/ /g).length > 2) return this.sendReply('You can only enter in a maximum of 3 words in your answer.');
 				if (typeof room.giveaway.answer === 'object' ? room.giveaway.answer.map(toId).indexOf(toId(target)) === -1 : toId(target) !== toId(room.giveaway.answer)) {
-					if (room.giveaway.answered[user.userid]) room.giveaway.answered[user.userid] ++;
+					if (room.giveaway.answered[user.userid]) room.giveaway.answered[user.userid]++;
 					else room.giveaway.answered[user.userid] = 1;
 					if (room.giveaway.answered[user.userid] === 3)
 						return this.sendReply("'" + target + "'" + " is not the correct answer... Better luck answering next time!");
@@ -238,7 +238,7 @@ exports.commands = {
 					'The lottery drawing will occur in 2 minutes' + ((target[2] && target[2] !== 1) ? ', with ' + room.giveaway.winnumber + ' winners!' : '!') + '<br/>' +
 					'<button name = "send" value = "/joinlottery"><font size = 1><b>Join</b></font></button> <button name = "send" value = "/leavelottery"><font size = 1><b>Leave</b></font></button><br/><br/><font size = 1><b><u>Note:</u> Please do not join if you don\'t have a 3DS and a copy of Pokémon X, Y, ΩR, or αS');
 				var thisroom = room;
-				room.giveaway.timer = setTimeout(function() {
+				room.giveaway.timer = setTimeout(function	() {
 					if (thisroom.giveaway.members.length < 4 + room.giveaway.winnumber) {
 						thisroom.add("|html|<b>The giveaway lottery has been ended due to the lack of users.");
 						thisroom.update();
@@ -297,7 +297,7 @@ exports.commands = {
 		}
 	},
 
-	guessanswer: function(target, user, room) {
+	guessanswer: function	(target, user, room) {
 		this.parse('/giveaway guess ' + target);
 	}
 };
