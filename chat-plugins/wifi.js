@@ -6,9 +6,9 @@ exports.commands = {
 
 	giveaway: function(target, room, user, connection, cmd) {
 		if (room.id !== 'wifi') return this.sendReply('This command can only be used in the Wi-Fi room.');
-			command = target.substring(0, target.indexOf(' ')) || toId(target);
-		var original = target;
-		var target = (command === original ? '' : original.substr(original.indexOf(' ') + 1));
+		var command = target.substring(0, target.indexOf(' ')) || toId(target);
+		var newtarget = (command === target ? '' : target.substr(target.indexOf(' ') + 1));
+		target = newtarget;
 		switch (toId(command)) {
 			case 'help':
 				if (!this.canBroadcast()) return;
