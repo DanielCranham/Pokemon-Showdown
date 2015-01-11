@@ -413,7 +413,7 @@ var commands = {
 
 exports.commands = {
 	'giveaway': commands,
-'	ga':	function (target)	{
-	return this.parse('/giveaway guess ' + target);
+	'ga':	function (target)	{
+		return this.parse('/giveaway guess ' + target);	
 	}
 };
