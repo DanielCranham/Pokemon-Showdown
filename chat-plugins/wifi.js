@@ -413,7 +413,11 @@ var commands = {
 
 exports.commands = {
 	'giveaway': commands,
+<<<<<<< HEAD
 	'ga':	function (target)	{
 		return this.parse('/giveaway guess ' + target);
 	}
+=======
+	'ga': commands.guess
+>>>>>>> upstream/master
 };
