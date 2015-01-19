@@ -15,11 +15,8 @@
  */
 
 /*
-
 To reload chat commands:
-
 /hotpatch chat
-
 */
 
 const MAX_MESSAGE_LENGTH = 300;
