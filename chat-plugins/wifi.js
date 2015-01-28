@@ -440,7 +440,7 @@ var commands = {
 var giveawayRoom = Rooms.get('wifi');
 if (giveawayRoom) {
 	if (giveawayRoom.plugin) {
-		giveaways = giveawayRoom.plugin.giveaways;
+giveaway = giveawayRoom.plugin.giveaways;
 	} else {
 		giveawayRoom.plugin = {
 			'giveaways': giveaway
