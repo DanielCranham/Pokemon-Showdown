@@ -21,7 +21,7 @@ if (!process.send) {
 	var callbacks = {};
 	var callbackData = {};
 
-	var child = require('child_process').fork('verifier.js');
+	var child = require('child_process').fork('verifier.js', {cwd: __dirname});
 	exports.verify = function (data, signature, callback) {
 		var localGuid = guid++;
 		callbacks[localGuid] = callback;
@@ -55,6 +55,10 @@ if (!process.send) {
 			success: success,
 			guid: message.guid
 		});
+	});
+
+	process.on('disconnect', function () {
+		process.exit();
 	});
 
 	require('./repl.js').start('verifier', function (cmd) { return eval(cmd); });

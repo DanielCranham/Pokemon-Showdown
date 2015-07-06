@@ -7,9 +7,9 @@
  *
  * Individual commands are put in:
  *   commands.js - "core" commands that shouldn't be modified
- *   config/commands.js - other commands that can be safely modified
+ *   chat-plugins/ - other commands that can be safely modified
  *
- * The command API is (mostly) documented in config/commands.js
+ * The command API is (mostly) documented in chat-plugins/COMMANDS.md
  *
  * @license MIT license
  */
@@ -28,6 +28,7 @@ const MESSAGE_COOLDOWN = 5 * 60 * 1000;
 const MAX_PARSE_RECURSION = 10;
 
 var fs = require('fs');
+var path = require('path');
 
 /*********************************************************
  * Load command files
@@ -35,14 +36,9 @@ var fs = require('fs');
 
 var commands = exports.commands = require('./commands.js').commands;
 
-var customCommands = require('./config/commands.js');
-if (customCommands && customCommands.commands) {
-	Object.merge(commands, customCommands.commands);
-}
-
 // Install plug-in commands
 
-fs.readdirSync('./chat-plugins').forEach(function (file) {
+fs.readdirSync(path.resolve(__dirname, 'chat-plugins')).forEach(function (file) {
 	if (file.substr(-3) === '.js') Object.merge(commands, require('./chat-plugins/' + file).commands);
 });
 
@@ -50,7 +46,7 @@ fs.readdirSync('./chat-plugins').forEach(function (file) {
  * Parser
  *********************************************************/
 
-var modlog = exports.modlog = {lobby: fs.createWriteStream('logs/modlog/modlog_lobby.txt', {flags:'a+'}), battle: fs.createWriteStream('logs/modlog/modlog_battle.txt', {flags:'a+'})};
+var modlog = exports.modlog = {lobby: fs.createWriteStream(path.resolve(__dirname, 'logs/modlog/modlog_lobby.txt'), {flags:'a+'}), battle: fs.createWriteStream(path.resolve(__dirname, 'logs/modlog/modlog_battle.txt'), {flags:'a+'})};
 
 /**
  * Can this user talk?
@@ -241,7 +237,7 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 		var context = {
 			sendReply: function (data) {
 				if (this.broadcasting) {
-					room.add(data, true);
+					room.add(data);
 				} else {
 					connection.sendTo(room, data);
 				}
@@ -253,7 +249,7 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 				connection.popup(message);
 			},
 			add: function (data) {
-				room.add(data, true);
+				room.add(data);
 			},
 			send: function (data) {
 				room.send(data);
@@ -284,7 +280,7 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 					if (room.battle) {
 						modlog[room.id] = modlog['battle'];
 					} else {
-						modlog[room.id] = fs.createWriteStream('logs/modlog/modlog_' + room.id + '.txt', {flags:'a+'});
+						modlog[room.id] = fs.createWriteStream(path.resolve(__dirname, 'logs/modlog/modlog_' + room.id + '.txt'), {flags:'a+'});
 					}
 				}
 				modlog[room.id].write('[' + (new Date().toJSON()) + '] (' + room.id + ') ' + result + '\n');
@@ -307,7 +303,7 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 					}
 
 					// broadcast cooldown
-					var normalized = toId(message);
+					var normalized = message.toLowerCase().replace(/[^a-z0-9\s!,]/g, '');
 					if (room.lastBroadcast === normalized &&
 							room.lastBroadcastTime >= Date.now() - BROADCAST_COOLDOWN) {
 						connection.sendTo(room, "You can't broadcast this because it was just broadcast.");
@@ -341,6 +337,36 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 						return false;
 					}
 				}
+				if (/>here.?</i.test(html) || /click here/i.test(html)) {
+					this.sendReply('Do not use "click here"');
+					return false;
+				}
+
+				// check for mismatched tags
+				var tags = html.toLowerCase().match(/<\/?(div|a|button|b|i|u|center|font)\b/g);
+				if (tags) {
+					var stack = [];
+					for (var i = 0; i < tags.length; i++) {
+						var tag = tags[i];
+						if (tag.charAt(1) === '/') {
+							if (!stack.length) {
+								this.sendReply("Extraneous </" + tag.substr(2) + "> without an opening tag.");
+								return false;
+							}
+							if (tag.substr(2) !== stack.pop()) {
+								this.sendReply("Missing </" + tag.substr(2) + "> or it's in the wrong place.");
+								return false;
+							}
+						} else {
+							stack.push(tag.substr(1));
+						}
+					}
+					if (stack.length) {
+						this.sendReply("Missing </" + stack.pop() + ">.");
+						return false;
+					}
+				}
+
 				return true;
 			},
 			targetUserOrSelf: function (target, exactName) {
@@ -381,7 +407,7 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 					'Additional information:\n' +
 					'user = ' + user.name + '\n' +
 					'room = ' + room.id + '\n' +
-					'message = ' + message;
+					'message = ' + originalMessage;
 			var fakeErr = {stack: stack};
 
 			if (!require('./crashlogger.js')(fakeErr, 'A chat command')) {
@@ -409,7 +435,7 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 			}
 		}
 
-		if (message.substr(0, 1) === '/' && fullCmd) {
+		if (message.charAt(0) === '/' && fullCmd) {
 			// To guard against command typos, we now emit an error message
 			return connection.sendTo(room.id, "The command '/" + fullCmd + "' was unrecognized. To send a message starting with '/" + fullCmd + "', type '//" + fullCmd + "'.");
 		}
@@ -428,7 +454,7 @@ var parse = exports.parse = function (message, room, user, connection, levelsDee
 };
 
 exports.package = {};
-fs.readFile('package.json', function (err, data) {
+fs.readFile(path.resolve(__dirname, 'package.json'), function (err, data) {
 	if (err) return;
 	exports.package = JSON.parse(data);
 });

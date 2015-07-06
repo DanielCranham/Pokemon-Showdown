@@ -48,46 +48,52 @@
 // aren't
 
 function runNpm(command) {
+	if (require.main !== module) throw new Error("Dependencies unmet");
+
 	command = 'npm ' + command + ' && ' + process.execPath + ' app.js';
 	console.log('Running `' + command + '`...');
 	require('child_process').spawn('sh', ['-c', command], {stdio: 'inherit', detached: true});
 	process.exit(0);
 }
 
-try {
-	require('sugar');
-} catch (e) {
-	runNpm('install');
-}
-if (!Object.select) {
-	runNpm('update');
-}
-
-// Make sure config.js exists, and copy it over from config-example.js
-// if it doesn't
+var isLegacyEngine = !global.Map;
 
 var fs = require('fs');
-
-// Synchronously, since it's needed before we can start the server
-if (!fs.existsSync('./config/config.js')) {
-	console.log("config.js doesn't exist - creating one with default settings...");
-	fs.writeFileSync('./config/config.js',
-		fs.readFileSync('./config/config-example.js')
-	);
+var path = require('path');
+try {
+	require('sugar');
+	if (isLegacyEngine) require('es6-shim');
+} catch (e) {
+	runNpm('install --production');
+}
+if (isLegacyEngine && !new Map().set()) {
+	runNpm('update --production');
 }
 
 /*********************************************************
  * Load configuration
  *********************************************************/
 
-global.Config = require('./config/config.js');
+try {
+	global.Config = require('./config/config.js');
+} catch (err) {
+	if (err.code !== 'MODULE_NOT_FOUND') throw err;
+
+	// Copy it over synchronously from config-example.js since it's needed before we can start the server
+	console.log("config.js doesn't exist - creating one with default settings...");
+	fs.writeFileSync(path.resolve(__dirname, 'config/config.js'),
+		fs.readFileSync(path.resolve(__dirname, 'config/config-example.js'))
+	);
+	global.Config = require('./config/config.js');
+}
 
 if (Config.watchconfig) {
-	fs.watchFile('./config/config.js', function (curr, prev) {
+	fs.watchFile(path.resolve(__dirname, 'config/config.js'), function (curr, prev) {
 		if (curr.mtime <= prev.mtime) return;
 		try {
 			delete require.cache[require.resolve('./config/config.js')];
 			global.Config = require('./config/config.js');
+			if (global.Users) Users.cacheGroupData();
 			console.log('Reloaded config/config.js');
 		} catch (e) {}
 	});
@@ -98,8 +104,9 @@ var cloudenv = require('cloud-env');
 Config.bindaddress = cloudenv.get('IP', Config.bindaddress || '');
 Config.port = cloudenv.get('PORT', Config.port);
 
-if (process.argv[2] && parseInt(process.argv[2])) {
+if (require.main === module && process.argv[2] && parseInt(process.argv[2])) {
 	Config.port = parseInt(process.argv[2]);
+	Config.ssl = null;
 }
 
 global.ResourceMonitor = {
@@ -209,7 +216,7 @@ global.ResourceMonitor = {
 		for (var i in this.networkUse) {
 			buf += '' + this.networkUse[i] + '\t' + this.networkCount[i] + '\t' + i + '\n';
 		}
-		fs.writeFile('logs/networkuse.tsv', buf);
+		fs.writeFile(path.resolve(__dirname, 'logs/networkuse.tsv'), buf);
 	},
 	clearNetworkUse: function () {
 		this.networkUse = {};
@@ -392,7 +399,7 @@ Rooms.global.formatListText = Rooms.global.getFormatListText();
 global.TeamValidator = require('./team-validator.js');
 
 // load ipbans at our leisure
-fs.readFile('./config/ipbans.txt', function (err, data) {
+fs.readFile(path.resolve(__dirname, 'config/ipbans.txt'), function (err, data) {
 	if (err) return;
 	data = ('' + data).split("\n");
 	var rangebans = [];

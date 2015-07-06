@@ -8,22 +8,22 @@ exports.BattleFormats = {
 
 	standard: {
 		effectType: 'Banlist',
-		ruleset: ['Sleep Clause Mod', 'Species Clause', 'Nickname Clause', 'OHKO Clause', 'Moody Clause', 'Evasion Moves Clause', 'Endless Battle Clause', 'HP Percentage Mod'],
+		ruleset: ['Sleep Clause Mod', 'Species Clause', 'Nickname Clause', 'OHKO Clause', 'Moody Clause', 'Evasion Moves Clause', 'Endless Battle Clause', 'HP Percentage Mod', 'Cancel Mod'],
 		banlist: ['Unreleased', 'Illegal']
 	},
 	standardnext: {
 		effectType: 'Banlist',
-		ruleset: ['Sleep Clause Mod', 'Species Clause', 'Nickname Clause', 'OHKO Clause', 'HP Percentage Mod'],
+		ruleset: ['Sleep Clause Mod', 'Species Clause', 'Nickname Clause', 'OHKO Clause', 'HP Percentage Mod', 'Cancel Mod'],
 		banlist: ['Illegal', 'Soul Dew']
 	},
 	standardubers: {
 		effectType: 'Banlist',
-		ruleset: ['Sleep Clause Mod', 'Species Clause', 'Nickname Clause', 'Moody Clause', 'OHKO Clause', 'Endless Battle Clause', 'HP Percentage Mod'],
+		ruleset: ['Sleep Clause Mod', 'Species Clause', 'Nickname Clause', 'Moody Clause', 'OHKO Clause', 'Endless Battle Clause', 'HP Percentage Mod', 'Cancel Mod'],
 		banlist: ['Unreleased', 'Illegal']
 	},
 	standardgbu: {
 		effectType: 'Banlist',
-		ruleset: ['Species Clause', 'Nickname Clause', 'Item Clause'],
+		ruleset: ['Species Clause', 'Nickname Clause', 'Item Clause', 'Cancel Mod'],
 		banlist: ['Unreleased', 'Illegal', 'Soul Dew',
 			'Mewtwo',
 			'Mew',
@@ -58,11 +58,28 @@ exports.BattleFormats = {
 	},
 	standarddoubles: {
 		effectType: 'Banlist',
-		ruleset: ['Species Clause', 'Nickname Clause', 'OHKO Clause', 'Moody Clause', 'Evasion Abilities Clause', 'Evasion Moves Clause', 'Endless Battle Clause', 'HP Percentage Mod'],
+		ruleset: ['Species Clause', 'Nickname Clause', 'OHKO Clause', 'Moody Clause', 'Evasion Abilities Clause', 'Evasion Moves Clause', 'Endless Battle Clause', 'HP Percentage Mod', 'Cancel Mod'],
 		banlist: ['Unreleased', 'Illegal']
 	},
 	pokemon: {
 		effectType: 'Banlist',
+		validateTeam: function (team, format) {
+			var problems = [];
+			// ----------- legality line ------------------------------------------
+			if (!format || !format.banlistTable || !format.banlistTable['illegal']) return problems;
+			// everything after this line only happens if we're doing legality enforcement
+			var kyurems = 0;
+			for (var i = 0; i < team.length; i++) {
+				if (team[i].species === 'Kyurem-White' || team[i].species === 'Kyurem-Black') {
+					if (kyurems > 0) {
+						problems.push('You cannot have more than one Kyurem-Black/Kyurem-White.');
+						break;
+					}
+					kyurems++;
+				}
+			}
+			return problems;
+		},
 		validateSet: function (set, format) {
 			var item = this.getItem(set.item);
 			var template = this.getTemplate(set.species);
@@ -527,6 +544,12 @@ exports.BattleFormats = {
 			this.reportExactHP = true;
 		}
 	},
+	cancelmod: {
+		effectType: 'Rule',
+		onStart: function () {
+			this.supportCancel = true;
+		}
+	},
 	sleepclausemod: {
 		effectType: 'Rule',
 		onStart: function () {
@@ -539,9 +562,8 @@ exports.BattleFormats = {
 			if (status.id === 'slp') {
 				for (var i = 0; i < target.side.pokemon.length; i++) {
 					var pokemon = target.side.pokemon[i];
-					if (pokemon.status === 'slp') {
-						if (!pokemon.statusData.source ||
-							pokemon.statusData.source.side !== pokemon.side) {
+					if (pokemon.hp && pokemon.status === 'slp') {
+						if (!pokemon.statusData.source || pokemon.statusData.source.side !== pokemon.side) {
 							this.add('-message', 'Sleep Clause Mod activated.');
 							return false;
 						}
@@ -591,11 +613,11 @@ exports.BattleFormats = {
 				// Very complex bans
 				if (typeTable.length > 1) return;
 				switch (typeTable[0]) {
-				case 'Dragon':
-					if (teamHas['kyuremwhite']) return ["Kyurem-White is banned from Dragon monotype teams."];
-					break;
 				case 'Flying':
-					if (teamHas['shayminsky']) return ["Shaymin-Sky is banned from Flying monotype teams."];
+					if (teamHas['zapdos']) return ["Zapdos is banned from Flying monotype teams."];
+					break;
+				case 'Psychic':
+					if (teamHas['galladite']) return ["Galladite is banned from Psychic monotype teams."];
 					break;
 				case 'Steel':
 					if (teamHas['aegislash']) return ["Aegislash is banned from Steel monotype teams."];
